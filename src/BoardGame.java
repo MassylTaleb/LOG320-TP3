@@ -3,26 +3,36 @@ import java.util.ArrayList;
 public class BoardGame {
 
     private int[][] board;
-    private int depth;
-    private boolean isRed;
+    private int treeDepth;
+    private boolean isBlack;
     private String strBoard;
     private int minMaxScore;
-    private ArrayList<BoardGame> children;
+    private ArrayList<BoardGame> childs;
     private GameState gameState;
     private String move;
     private int alpha;
     private int beta;
-    private int score;
+    private int boardScore;
+    private BoardHeuristic boardHeuristic;
 
-    public BoardGame(int[][] board, boolean isRed, int depth, String move, int parentScore){
+    public BoardGame(int[][] board, boolean isBlack, int depth, String move, int parentScore){
 
-        this.children = new ArrayList<BoardGame>();
+        this.childs = new ArrayList<BoardGame>();
         this.board = board;
-        this.depth = depth;
-        this.isRed = isRed;
+        this.treeDepth = depth;
+        this.isBlack = isBlack;
         this.move = move;
-
-
+        boardHeuristic = new BoardHeuristic();
+        this.boardScore = boardHeuristic.getBoardHeuristic(board, isBlack);
+        if(this.boardScore == 1000000){
+            this.gameState = GameState.Won;
+        }
+        else if (this.boardScore == -1000000){
+            this.gameState = GameState.Lost;
+        }
+        else{
+            this.gameState = GameState.Playing;
+        }
     }
 }
 
