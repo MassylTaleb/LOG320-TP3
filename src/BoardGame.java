@@ -76,5 +76,17 @@ public class BoardGame {
     public int[][] getBoard() {
         return board;
     }
+
+    public ArrayList<BoardGame> getChilds() {
+        return childs;
+    }
+
+    public void setChilds(ArrayList<BoardGame> childs) {
+        this.childs = childs;
+    }
+
+    public String getMove() {
+        return move;
+    }
 }
 

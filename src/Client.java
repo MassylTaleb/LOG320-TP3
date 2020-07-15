@@ -33,10 +33,10 @@ class Client {
                     String[] boardValues;
                     boardValues = s.split(" ");
                     int x=0,y=0;
-                    for(int i=0; i<boardValues.length;i++){
-                        board[x][y] = Integer.parseInt(boardValues[i]);
+                    for (String boardValue : boardValues) {
+                        board[x][y] = Integer.parseInt(boardValue);
                         x++;
-                        if(x == 8){
+                        if (x == 8) {
                             x = 0;
                             y++;
                         }
@@ -44,9 +44,19 @@ class Client {
                     BoardGame boardGame = new BoardGame(board, false, 0, null, 0);
                     Algorithm.minimax(boardGame, true);
                     System.out.println("Nouvelle partie! Vous jouer blanc, entrez votre premier coup : ");
-                    String move = null;
-                    move = console.readLine();
-                    output.write(move.getBytes(),0,move.length());
+                    BoardGame move = null;
+
+                    for(BoardGame child : boardGame.getChilds()) {
+                        if(move == null) {
+                            move = child;
+                        } else {
+                            if(move.getMinMaxScore() < child.getMinMaxScore()) {
+                                move = child;
+                            }
+                        }
+                    }
+                    board = move.getBoard();
+                    output.write(move.getMove().getBytes(),0,move.getMove().length());
                     output.flush();
                 }
                 // Debut de la partie en joueur Noir

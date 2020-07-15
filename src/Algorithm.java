@@ -81,6 +81,7 @@ public class Algorithm {
 
         }
         board.setMinMaxScore(bestPlay.getMinMaxScore());
+        board.setChilds(childs);
     }
 
     static void expandChilds(ArrayList<BoardGame> childs, BoardGame boardGame) {
