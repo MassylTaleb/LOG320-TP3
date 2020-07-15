@@ -1,9 +1,9 @@
- public enum PawnType {
-    BLACK(2), RED(4);
+ public enum CellType {
+    BLACK(2), RED(4), EMPTY(0), FORBIDDEN(-1);
 
      private final int pawnType;
 
-     PawnType(int pawnType) {
+     CellType(int pawnType) {
          this.pawnType = pawnType;
      }
 

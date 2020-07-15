@@ -16,7 +16,7 @@ class Client {
             input    = new BufferedInputStream(MyClient.getInputStream());
             output   = new BufferedOutputStream(MyClient.getOutputStream());
             BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
-            while(1 == 1){
+            while(true){
                 char cmd = 0;
 
                 cmd = (char)input.read();
@@ -41,7 +41,8 @@ class Client {
                             y++;
                         }
                     }
-
+                    BoardGame boardGame = new BoardGame(board, false, 0, null, 0);
+                    Algorithm.minimax(boardGame, true);
                     System.out.println("Nouvelle partie! Vous jouer blanc, entrez votre premier coup : ");
                     String move = null;
                     move = console.readLine();
