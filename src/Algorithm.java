@@ -4,7 +4,8 @@ public class Algorithm {
 
     public static void minimax(BoardGame board, boolean maximizingPlayer) {
 
-        ArrayList<BoardGame> childs = new ArrayList<>();
+        if(Timer.getTimeElapsed() > 4.0)
+            return;
 
         if(board.getTreeDepth() < 4 && board.getGameState() == GameState.Playing) {
             // We're red, and we're trying to maximize alpha
@@ -26,7 +27,7 @@ public class Algorithm {
 
             board.setAlpha(-1000000);
             board.setBeta(1000000);
-            expandChilds(childs, board);
+            expandChilds(board);
         }
         else {
             board.setMinMaxScore(board.getBoardScore());
@@ -34,13 +35,13 @@ public class Algorithm {
             board.setBeta(0);
         }
 
-        if(childs.isEmpty()) {
+        if(board.getChilds().isEmpty()) {
             return;
         }
 
         BoardGame bestPlay = null;
         if(maximizingPlayer) {
-            for(BoardGame childBoard : childs) {
+            for(BoardGame childBoard : board.getChilds()) {
                 minimax(childBoard, false);
 
                 if(bestPlay == null) {
@@ -60,7 +61,7 @@ public class Algorithm {
             }
 
         } else {
-            for(BoardGame childBoard : childs) {
+            for(BoardGame childBoard : board.getChilds()) {
                 minimax(childBoard, true);
 
                 if(bestPlay == null) {
@@ -81,10 +82,10 @@ public class Algorithm {
 
         }
         board.setMinMaxScore(bestPlay.getMinMaxScore());
-        board.setChilds(childs);
+        board.setChilds(board.getChilds());
     }
 
-    static void expandChilds(ArrayList<BoardGame> childs, BoardGame boardGame) {
+    static void expandChilds(BoardGame boardGame) {
 
         int depthTree = boardGame.isBlack() ? 1 : 0;
         int[][] boardCopy;
@@ -97,7 +98,7 @@ public class Algorithm {
             for(int j = 0; j < boardGame.getBoard()[0].length; j++) {
 
                 boardCopy = cloneBoard(boardGame.getBoard());
-                contentLeftDiagonalCell = BoardTools.getLeftDiagonalCellPosition(boardCopy, i, j);
+                contentLeftDiagonalCell = BoardTools.getLeftDiagonalPosition(boardCopy, i, j);
                 contentRightDiagonalCell = BoardTools.getRightDiagonalCellPosition(boardCopy, i, j);
                 contentFrontCell = BoardTools.getFrontCellPosition(boardCopy, i, j);
                 if(boardGame.getTreeDepth() % 2 == depthTree) {
@@ -105,20 +106,20 @@ public class Algorithm {
                     if(boardCopy[i][j] == CellType.RED.getValue()) {
                         if(contentLeftDiagonalCell != CellType.FORBIDDEN.getValue() && contentLeftDiagonalCell != CellType.RED.getValue()) {
                             BoardTools.moveToLeftDiagonal(boardCopy, i, j);
-                            newMove = BoardTools.positionValue(i, j) + BoardTools.positionValue(i - 1, j + 1);
-                            childs.add(new BoardGame(boardCopy, boardGame.isBlack(), boardGame.getTreeDepth() + 1, newMove, boardGame.getBoardScore()));
+                            newMove = BoardTools.positionValue(boardCopy,i, j) + BoardTools.positionValue(boardCopy,i - 1, j - 1);
+                            boardGame.getChilds().add(new BoardGame(boardCopy, boardGame.isBlack(), boardGame.getTreeDepth() + 1, newMove, boardGame.getBoardScore()));
                         }
 
                         if(contentRightDiagonalCell != CellType.FORBIDDEN.getValue() && contentRightDiagonalCell != CellType.RED.getValue()) {
                             BoardTools.moveToRightDiagonal(boardCopy, i, j);
-                            newMove = BoardTools.positionValue(i, j) + BoardTools.positionValue(i + 1, j + 1);
-                            childs.add(new BoardGame(boardCopy, boardGame.isBlack(), boardGame.getTreeDepth() + 1, newMove, boardGame.getBoardScore()));
+                            newMove = BoardTools.positionValue(boardCopy,i, j) + BoardTools.positionValue(boardCopy,i - 1, j + 1);
+                            boardGame.getChilds().add(new BoardGame(boardCopy, boardGame.isBlack(), boardGame.getTreeDepth() + 1, newMove, boardGame.getBoardScore()));
                         }
 
-                        if(contentFrontCell != CellType.FORBIDDEN.getValue()) {
-                            BoardTools.getFrontCellPosition(boardCopy, i, j);
-                            newMove = BoardTools.positionValue(i, j) + BoardTools.positionValue(i, j + 1);
-                            childs.add(new BoardGame(boardCopy, boardGame.isBlack(), boardGame.getTreeDepth() + 1, newMove, boardGame.getBoardScore()));
+                        if(contentFrontCell != CellType.FORBIDDEN.getValue() && contentFrontCell != CellType.BLACK.getValue()) {
+                            BoardTools.moveToFront(boardCopy, i, j);
+                            newMove = BoardTools.positionValue(boardCopy, i, j) + BoardTools.positionValue(boardCopy, i - 1, j);
+                            boardGame.getChilds().add(new BoardGame(boardCopy, boardGame.isBlack(), boardGame.getTreeDepth() + 1, newMove, boardGame.getBoardScore()));
                         }
                     }
                 } else {
@@ -126,20 +127,20 @@ public class Algorithm {
                     if(boardCopy[i][j] == CellType.BLACK.getValue()) {
                         if(contentLeftDiagonalCell != CellType.FORBIDDEN.getValue() && contentLeftDiagonalCell != CellType.BLACK.getValue()) {
                             BoardTools.moveToLeftDiagonal(boardCopy, i, j);
-                            newMove = BoardTools.positionValue(i, j) + BoardTools.positionValue(i + 1, j - 1);
-                            childs.add(new BoardGame(boardCopy, boardGame.isBlack(), boardGame.getTreeDepth() + 1, newMove, boardGame.getBoardScore()));
+                            newMove = BoardTools.positionValue(boardCopy,i, j) + BoardTools.positionValue(boardCopy, i + 1, j - 1);
+                            boardGame.getChilds().add(new BoardGame(boardCopy, boardGame.isBlack(), boardGame.getTreeDepth() + 1, newMove, boardGame.getBoardScore()));
                         }
 
                         if(contentRightDiagonalCell != CellType.FORBIDDEN.getValue() && contentRightDiagonalCell != CellType.BLACK.getValue()) {
                             BoardTools.moveToRightDiagonal(boardCopy, i, j);
-                            newMove = BoardTools.positionValue(i, j) + BoardTools.positionValue(i - 1, j - 1);
-                            childs.add(new BoardGame(boardCopy, boardGame.isBlack(), boardGame.getTreeDepth() + 1, newMove, boardGame.getBoardScore()));
+                            newMove = BoardTools.positionValue(boardCopy, i, j) + BoardTools.positionValue(boardCopy,i + 1, j + 1);
+                            boardGame.getChilds().add(new BoardGame(boardCopy, boardGame.isBlack(), boardGame.getTreeDepth() + 1, newMove, boardGame.getBoardScore()));
                         }
 
-                        if(contentFrontCell != CellType.FORBIDDEN.getValue()) {
-                            BoardTools.getFrontCellPosition(boardCopy, i, j);
-                            newMove = BoardTools.positionValue(i, j) + BoardTools.positionValue(i, j - 1);
-                            childs.add(new BoardGame(boardCopy, boardGame.isBlack(), boardGame.getTreeDepth() + 1, newMove, boardGame.getBoardScore()));
+                        if(contentFrontCell != CellType.FORBIDDEN.getValue() && contentFrontCell != CellType.RED.getValue()) {
+                            BoardTools.moveToFront(boardCopy, i, j);
+                            newMove = BoardTools.positionValue(boardCopy, i, j) + BoardTools.positionValue(boardCopy,i + 1, j);
+                            boardGame.getChilds().add(new BoardGame(boardCopy, boardGame.isBlack(), boardGame.getTreeDepth() + 1, newMove, boardGame.getBoardScore()));
                         }
                     }
                 }

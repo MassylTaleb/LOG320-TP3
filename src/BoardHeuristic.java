@@ -39,7 +39,7 @@ public class BoardHeuristic {
                     if(isPawnAtRisk(board, i, j, isBlack)){
 
                         riskValue = 0;
-                    }else{
+                    } else {
                         riskValue = 1;
                     }
 
@@ -51,19 +51,19 @@ public class BoardHeuristic {
                     }
 
                     if (!isBlack && i == 7 && pawnType == CellType.RED.getValue()){
-                        boardScore += 20;
+                        boardScore += 10;
                     }
 
                     if(isBlack && i == 0 && pawnType == CellType.BLACK.getValue()){
-                        boardScore += 20;
+                        boardScore += 10;
                     }
 
                     if(!isBlack && i > 3 && pawnType == CellType.BLACK.getValue()){
-                        boardScore -= 200;
+                        boardScore -= 100;
                     }
 
                     if(isBlack && i < 4 && pawnType == CellType.RED.getValue()){
-                        boardScore -= 200;
+                        boardScore -= 100;
                     }
 
                 }
@@ -78,7 +78,7 @@ public class BoardHeuristic {
     // Dont have a strategy for now
     public static boolean isPawnAtRisk(int[][] board, int i, int j, boolean isBlack){
 
-        return false;
+        return true;
     }
 
     public GameState getGameState(int[][] board, boolean isBlack){
