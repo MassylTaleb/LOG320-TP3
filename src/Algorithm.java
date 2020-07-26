@@ -4,8 +4,8 @@ public class Algorithm {
 
     public static void minimax(BoardGame board, boolean maximizingPlayer) {
 
-        if(Timer.getTimeElapsed() > 4.0)
-            return;
+        /*if(Timer.getTimeElapsed() > 4.0)
+            return;*/
 
         if(board.getTreeDepth() < 4 && board.getGameState() == GameState.Playing) {
             // We're red, and we're trying to maximize alpha

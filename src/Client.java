@@ -76,10 +76,10 @@ class Client {
                     int x=0,y=0;
                     for(int i=0; i<boardValues.length;i++){
                         board[x][y] = Integer.parseInt(boardValues[i]);
-                        x++;
-                        if(x == 8){
-                            x = 0;
-                            y++;
+                        y++;
+                        if(y == 8){
+                            y = 0;
+                            x++;
                         }
                     }
                 }

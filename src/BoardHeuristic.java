@@ -8,6 +8,7 @@ public class BoardHeuristic {
     public int getBoardHeuristic(int[][] board, boolean isBlack){
 
         int boardScore = 0;
+
         if(getGameState(board, isBlack) == GameState.Lost){
 
             return -1000000;
