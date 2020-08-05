@@ -8,6 +8,7 @@ public class BoardHeuristic {
     public int getBoardHeuristic(int[][] board, boolean isBlack){
 
         int boardScore = 0;
+
         if(getGameState(board, isBlack) == GameState.Lost){
 
             return -1000000;
@@ -28,42 +29,42 @@ public class BoardHeuristic {
                 for(int j = 0; j < board[i].length; j++){
 
                     int pawnType = board[i][j];
-                    if(!isBlack && pawnType == PawnType.RED.getValue()){
+                    if(!isBlack && pawnType == CellType.RED.getValue()){
                         pawnsCount ++;
                     }
 
-                    if(isBlack && pawnType == PawnType.BLACK.getValue()){
+                    if(isBlack && pawnType == CellType.BLACK.getValue()){
                         pawnsCount ++;
                     }
 
                     if(isPawnAtRisk(board, i, j, isBlack)){
 
                         riskValue = 0;
-                    }else{
+                    } else {
                         riskValue = 1;
                     }
 
-                    if(pawnType == PawnType.BLACK.getValue()){
+                    if(pawnType == CellType.BLACK.getValue()){
                         boardScore += Math.pow(2, i) * blackPawnMultiplier * riskValue;
                     }
-                    else if(pawnType == PawnType.RED.getValue()){
+                    else if(pawnType == CellType.RED.getValue()){
                         boardScore += Math.pow(2, board.length - 1 - i) * redPawnMultiplier * riskValue;
                     }
 
-                    if (!isBlack && i == 7 && pawnType == PawnType.RED.getValue()){
-                        boardScore += 20;
+                    if (!isBlack && i == 7 && pawnType == CellType.RED.getValue()){
+                        boardScore += 10;
                     }
 
-                    if(isBlack && i == 0 && pawnType == PawnType.BLACK.getValue()){
-                        boardScore += 20;
+                    if(isBlack && i == 0 && pawnType == CellType.BLACK.getValue()){
+                        boardScore += 10;
                     }
 
-                    if(!isBlack && i > 3 && pawnType == PawnType.BLACK.getValue()){
-                        boardScore -= 200;
+                    if(!isBlack && i > 3 && pawnType == CellType.BLACK.getValue()){
+                        boardScore -= 100;
                     }
 
-                    if(isBlack && i < 4 && pawnType == PawnType.RED.getValue()){
-                        boardScore -= 200;
+                    if(isBlack && i < 4 && pawnType == CellType.RED.getValue()){
+                        boardScore -= 100;
                     }
 
                 }
@@ -72,14 +73,13 @@ public class BoardHeuristic {
             boardScore += pawnsCount * 20;
         }
 
-
         return boardScore;
     }
 
     // Dont have a strategy for now
     public static boolean isPawnAtRisk(int[][] board, int i, int j, boolean isBlack){
 
-        return false;
+        return true;
     }
 
     public GameState getGameState(int[][] board, boolean isBlack){
@@ -88,13 +88,13 @@ public class BoardHeuristic {
 
             for(int j = 0; j < board[0].length; j++){
 
-                if(board[0][j] == PawnType.RED.getValue())
+                if(board[0][j] == CellType.RED.getValue())
                     return GameState.Won;
             }
 
             for(int j = 0; j < board[board.length - 1].length; j++){
 
-                if(board[board.length - 1][j] == PawnType.BLACK.getValue())
+                if(board[board.length - 1][j] == CellType.BLACK.getValue())
                     return GameState.Lost;
             }
         }
@@ -103,19 +103,17 @@ public class BoardHeuristic {
 
             for(int j = 0; j < board[board.length - 1].length; j++){
 
-                if(board[board.length - 1][j] == PawnType.BLACK.getValue())
+                if(board[board.length - 1][j] == CellType.BLACK.getValue())
                     return GameState.Won;
             }
 
             for(int j = 0; j < board[0].length; j++){
 
-                if(board[0][j] == PawnType.RED.getValue())
+                if(board[0][j] == CellType.RED.getValue())
                     return GameState.Lost;
             }
         }
 
-
         return GameState.Playing;
-
     }
 }
