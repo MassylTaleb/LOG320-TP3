@@ -21,18 +21,20 @@ class Client {
 
                 cmd = (char)input.read();
                 System.out.println(cmd);
+
                 // Debut de la partie en joueur rouge
-                if(cmd == '1'){
+                if(cmd == '1') {
                     byte[] aBuffer = new byte[1024];
 
                     int size = input.available();
-                    //System.out.println("size " + size);
                     input.read(aBuffer,0,size);
+
                     String s = new String(aBuffer).trim();
                     System.out.println(s);
-                    String[] boardValues;
-                    boardValues = s.split(" ");
-                    int x=0,y=0;
+
+                    String[] boardValues = s.split(" ");
+
+                    int x = 0, y = 0;
                     for (String boardValue : boardValues) {
                         board[x][y] = Integer.parseInt(boardValue);
                         y++;
@@ -41,8 +43,10 @@ class Client {
                             x++;
                         }
                     }
+
                     Timer.resetTimer();
                     Timer.startTimer();
+
                     BoardGame boardGame = new BoardGame(board, false, 0, null, 0);
                     Algorithm.minimax(boardGame, true);
                     System.out.println("Nouvelle partie! Vous jouer blanc, entrez votre premier coup : ");
@@ -83,7 +87,6 @@ class Client {
                         }
                     }
                 }
-
 
                 // Le serveur demande le prochain coup
                 // Le message contient aussi le dernier coup joue.

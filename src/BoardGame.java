@@ -13,8 +13,16 @@ public class BoardGame {
     private int alpha;
     private int beta;
     private int boardScore;
-    private BoardHeuristic boardHeuristic;
 
+    /**
+     * Save all borad information and checking the current state of the board.
+     *
+     * @param board Current board
+     * @param isBlack Which colour is playing
+     * @param depth Tree depth reference for the board (copy or initial board)
+     * @param move Move currently evaluated
+     * @param parentScore Score of the parent node
+     */
     public BoardGame(int[][] board, boolean isBlack, int depth, String move, int parentScore) {
 
         this.childs = new ArrayList<>();
@@ -22,13 +30,21 @@ public class BoardGame {
         this.treeDepth = depth;
         this.isBlack = isBlack;
         this.move = move;
-        boardHeuristic = new BoardHeuristic();
-        this.boardScore = boardHeuristic.getBoardHeuristic(board, isBlack);
-        if (this.boardScore == 1000000) {
+
+        // Affect the score of the current board
+        this.boardScore = new BoardHeuristic().getBoardHeuristic(board, isBlack);
+
+        // Set game status depending on score
+        if (this.boardScore == GameScores.SCORE_WIN.getValue()) {
+
             this.gameState = GameState.Won;
-        } else if (this.boardScore == -1000000) {
+
+        } else if (this.boardScore == GameScores.SCORE_LOST.getValue()) {
+
             this.gameState = GameState.Lost;
+
         } else {
+
             this.gameState = GameState.Playing;
         }
     }

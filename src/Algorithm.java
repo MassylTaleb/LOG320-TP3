@@ -7,26 +7,28 @@ public class Algorithm {
         /*if(Timer.getTimeElapsed() > 4.0)
             return;*/
 
+        // Check if
         if(board.getTreeDepth() < 4 && board.getGameState() == GameState.Playing) {
-            // We're red, and we're trying to maximize alpha
+
+            // If we're red, we're trying to maximize alpha (finding the best play for us)
             if(!board.isBlack() && board.getTreeDepth() % 2 == 0) {
-                board.setMinMaxScore(-1000000);
+                board.setMinMaxScore(-1000000000);
             }
-            // We're red, and we're trying to minimize beta
+            // If we're red, and we're trying to minimize beta (finding the best play for the opponent)
             if(!board.isBlack() && board.getTreeDepth() % 2 != 0) {
-                board.setMinMaxScore(1000000);
+                board.setMinMaxScore(1000000000);
             }
-            // We're black, and we're trying to maximize alpha
+            // If we're black, and we're trying to maximize alpha (finding the best play for us)
             if(board.isBlack() && board.getTreeDepth() % 2 == 0) {
-                board.setMinMaxScore(-1000000);
+                board.setMinMaxScore(-1000000000);
             }
-            // We're black, and we're trying to minimize beta
+            // We're black, and we're trying to minimize beta (finding the best play for the opponent)
             if(board.isBlack() && board.getTreeDepth() % 2 != 0) {
-                board.setMinMaxScore(1000000);
+                board.setMinMaxScore(1000000000);
             }
 
-            board.setAlpha(-1000000);
-            board.setBeta(1000000);
+            board.setAlpha(-1000000000);
+            board.setBeta(1000000000);
             expandChilds(board);
         }
         else {
@@ -116,7 +118,7 @@ public class Algorithm {
                             boardGame.getChilds().add(new BoardGame(boardCopy, boardGame.isBlack(), boardGame.getTreeDepth() + 1, newMove, boardGame.getBoardScore()));
                         }
 
-                        if(contentFrontCell != CellType.FORBIDDEN.getValue() && contentFrontCell != CellType.BLACK.getValue()) {
+                        if(contentFrontCell != CellType.FORBIDDEN.getValue() && contentFrontCell != CellType.RED.getValue()) {
                             BoardTools.moveToFront(boardCopy, i, j);
                             newMove = BoardTools.positionValue(boardCopy, i, j) + BoardTools.positionValue(boardCopy, i - 1, j);
                             boardGame.getChilds().add(new BoardGame(boardCopy, boardGame.isBlack(), boardGame.getTreeDepth() + 1, newMove, boardGame.getBoardScore()));
@@ -137,7 +139,7 @@ public class Algorithm {
                             boardGame.getChilds().add(new BoardGame(boardCopy, boardGame.isBlack(), boardGame.getTreeDepth() + 1, newMove, boardGame.getBoardScore()));
                         }
 
-                        if(contentFrontCell != CellType.FORBIDDEN.getValue() && contentFrontCell != CellType.RED.getValue()) {
+                        if(contentFrontCell != CellType.FORBIDDEN.getValue() && contentFrontCell != CellType.BLACK.getValue()) {
                             BoardTools.moveToFront(boardCopy, i, j);
                             newMove = BoardTools.positionValue(boardCopy, i, j) + BoardTools.positionValue(boardCopy,i + 1, j);
                             boardGame.getChilds().add(new BoardGame(boardCopy, boardGame.isBlack(), boardGame.getTreeDepth() + 1, newMove, boardGame.getBoardScore()));
