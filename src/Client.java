@@ -51,7 +51,7 @@ class Client {
                     Algorithm.minimax(boardGame, true);
                     System.out.println("Nouvelle partie! Vous jouer blanc, entrez votre premier coup : ");
                     BoardGame move = null;
-
+                    //I guess we're trying to find the best move through its highest score
                     for(BoardGame child : boardGame.getChilds()) {
                         if(move == null) {
                             move = child;
@@ -117,6 +117,7 @@ class Client {
                     }
                     board = move.getBoard();
                     output.write(move.getMove().getBytes(),0,move.getMove().length());
+                    System.out.println(move.getMove().getBytes() + "  " + move.getMove().length());
                     output.flush();
 
                 }
