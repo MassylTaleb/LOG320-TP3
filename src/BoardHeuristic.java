@@ -30,8 +30,9 @@ public class BoardHeuristic {
             for(int i = 0; i < board.length; i++){
                 for(int j = 0; j < board[i].length; j++){
 
-                    // Count how many token is on board
+                    // Current pawn
                     int pawnType = board[i][j];
+
                     if(!isBlack && pawnType == CellType.RED.getValue()){
                         pawnsCount ++;
                     }
@@ -41,11 +42,7 @@ public class BoardHeuristic {
                     }
 
                     // Check if token is at risk of being killed
-                    if(isPawnAtRisk(board, i, j, isBlack)){
-                        riskValue = 0;
-                    } else {
-                        riskValue = 1;
-                    }
+                    riskValue = isPawnAtRisk(board, i, j, isBlack) ? 0 : 1;
 
                     // Check how far is the pawn from the finish line
                     if(pawnType == CellType.BLACK.getValue()){
@@ -55,7 +52,6 @@ public class BoardHeuristic {
                         boardScore += Math.pow(2, board.length - 1 - i) * redPawnMultiplier * riskValue;
                     }
 
-                    // TODO: Pas compris !
                     if (!isBlack && i == 7 && pawnType == CellType.RED.getValue()){
                         boardScore += 10;
                     }
@@ -73,6 +69,7 @@ public class BoardHeuristic {
                     }
 
                 }
+                boardScore += pawnBackupScore(board, i, isBlack);
             }
 
             // For each pawn still alive, we give points
@@ -85,7 +82,100 @@ public class BoardHeuristic {
     // Dont have a strategy for now
     public static boolean isPawnAtRisk(int[][] board, int i, int j, boolean isBlack){
 
-        return true;
+        int contentLeftDiagonalCell = BoardTools.getLeftDiagonalPosition(board, i, j);
+        int contentRightDiagonalCell = BoardTools.getRightDiagonalCellPosition(board, i, j);
+        boolean isInDanger;
+
+        if(isBlack && board[i][j] == CellType.BLACK.getValue()) {
+            isInDanger = contentLeftDiagonalCell == CellType.RED.getValue() || contentRightDiagonalCell == CellType.RED.getValue();
+
+            if(isInDanger && isPositionSecured(board, i, j, isBlack)) {
+                return false;
+            }
+
+            return isInDanger;
+        }
+
+        else if(!isBlack && board[i][j] == CellType.RED.getValue()) {
+            isInDanger = contentLeftDiagonalCell == CellType.BLACK.getValue() || contentRightDiagonalCell == CellType.BLACK.getValue();
+
+            if(isInDanger && isPositionSecured(board, i, j, isBlack)) {
+                return false;
+            }
+
+            return isInDanger;
+        }
+
+        return false;
+    }
+
+    public static boolean isPositionSecured(int[][] board, int i, int j, boolean isBlack) {
+        int enemiesHelpingPawnInDanger = 0;
+
+        if(!isBlack) {
+            if(BoardTools.getLeftDiagonalPosition(board, i, j) == CellType.BLACK.getValue()) {
+                enemiesHelpingPawnInDanger++;
+            }
+            if(BoardTools.getRightDiagonalCellPosition(board, i, j) == CellType.BLACK.getValue()) {
+                enemiesHelpingPawnInDanger++;
+            }
+            return (BoardTools.getDownLeftDiagonalCellPosition(board, i, j) == CellType.RED.getValue() ||
+                    BoardTools.getDownRightDiagonalCellPosition(board, i, j) == CellType.RED.getValue()) &&
+                    enemiesHelpingPawnInDanger != 2;
+        }
+        else {
+            if(BoardTools.getLeftDiagonalPosition(board, i, j) == CellType.RED.getValue()) {
+                enemiesHelpingPawnInDanger++;
+            }
+            if(BoardTools.getRightDiagonalCellPosition(board, i, j) == CellType.RED.getValue()) {
+                enemiesHelpingPawnInDanger++;
+            }
+            return (BoardTools.getDownLeftDiagonalCellPosition(board, i, j) == CellType.BLACK.getValue() ||
+                    BoardTools.getDownRightDiagonalCellPosition(board, i, j) == CellType.BLACK.getValue()) &&
+                    enemiesHelpingPawnInDanger != 2;
+        }
+    }
+
+
+    private int pawnBackupScore(int[][] board, int i, boolean isBlack) {
+
+        int score = 0;
+
+        if(!isBlack){
+
+            boolean atLeastOne = false;
+
+            for(int column = 0; column >= board[i].length; column++){
+
+                if(board[i][column] == CellType.RED.getValue() && !atLeastOne)
+                    atLeastOne = true;
+
+                else if(board[i][column] == CellType.RED.getValue() && atLeastOne)
+                    score += 100;
+
+                else
+                    atLeastOne = false;
+            }
+        }
+
+        else{
+
+            boolean atLeastOne = false;
+
+            for(int column = 0; column >= board[i].length; column++){
+
+                if(board[i][column] == CellType.BLACK.getValue() && !atLeastOne)
+                    atLeastOne = true;
+
+                else if(board[i][column] == CellType.BLACK.getValue() && atLeastOne)
+                    score += 100;
+
+                else
+                    atLeastOne = false;
+            }
+        }
+
+        return score;
     }
 
     public GameState getGameState(int[][] board, boolean isBlack){

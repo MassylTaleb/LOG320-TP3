@@ -2,11 +2,10 @@ public class Algorithm {
 
     public static void minimax(BoardGame board, boolean maximizingPlayer) {
 
-        /*if(Timer.getTimeElapsed() > 4.0)
-            return;*/
+        if (Timer.getTimeElapsed() > 4.0) { return; }
 
         // Check if
-        if(board.getTreeDepth() < 4 && board.getGameState() == GameState.Playing) {
+        if(board.getTreeDepth() < 6 && board.getGameState() == GameState.Playing) {
 
             // If we're red, we're trying to maximize alpha (finding the best play for us)
             if(!board.isBlack() && board.getTreeDepth() % 2 == 0) {
@@ -41,6 +40,7 @@ public class Algorithm {
 
         BoardGame bestPlay = null;
         if(maximizingPlayer) {
+
             for(BoardGame childBoard : board.getChilds()) {
                 minimax(childBoard, false);
 
@@ -93,7 +93,7 @@ public class Algorithm {
      */
     static void expandChilds(BoardGame boardGame) {
 
-        int depthTree = boardGame.isBlack() ? 1 : 0; //depth tree is 1 if pawn black or 0 if pawn is red
+        int depthTree = boardGame.isBlack() ? 1 : 0; //
         int[][] boardCopy; //deaclaration of board copy
         int contentLeftDiagonalCell; //decalaration of left diagonal move
         int contentRightDiagonalCell; //decalaration of right diagonal move

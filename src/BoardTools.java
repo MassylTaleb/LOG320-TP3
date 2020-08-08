@@ -104,4 +104,36 @@ public class BoardTools {
             board[xPosition][yPosition] = CellType.EMPTY.getValue();
         }
     }
+
+    public static int getDownLeftDiagonalCellPosition(int[][] boardState, int xPosition, int yPosition){
+
+        int position = CellType.FORBIDDEN.getValue();
+
+        if(yPosition > 0){
+
+            if(boardState[xPosition][yPosition] == CellType.BLACK.getValue() && xPosition > 0)
+                position = boardState[xPosition - 1][yPosition - 1];
+
+            else if(boardState[xPosition][yPosition] == CellType.RED.getValue() && xPosition < boardState.length - 1)
+                position = boardState[xPosition + 1][yPosition - 1];
+        }
+
+        return position;
+    }
+
+    public static int getDownRightDiagonalCellPosition(int[][] boardState, int xPosition, int yPosition){
+
+        int position = CellType.FORBIDDEN.getValue();
+
+        if(yPosition < boardState.length - 1){
+
+            if(boardState[xPosition][yPosition] == CellType.BLACK.getValue() && xPosition > 0)
+                position = boardState[xPosition - 1][yPosition + 1];
+
+            else if(boardState[xPosition][yPosition] == CellType.RED.getValue() && xPosition < boardState.length - 1)
+                position = boardState[xPosition + 1][yPosition + 1];
+        }
+
+        return position;
+    }
 }

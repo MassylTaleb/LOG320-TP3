@@ -27,7 +27,7 @@ class Client {
                     byte[] aBuffer = new byte[1024];
 
                     int size = input.available();
-                    input.read(aBuffer,0,size);
+                    input.read(aBuffer,0, size);
 
                     String s = new String(aBuffer).trim();
                     System.out.println(s);
@@ -50,19 +50,21 @@ class Client {
                     BoardGame boardGame = new BoardGame(board, false, 0, null, 0);
                     Algorithm.minimax(boardGame, true);
                     System.out.println("Nouvelle partie! Vous jouer blanc, entrez votre premier coup : ");
-                    BoardGame move = null;
-                    //I guess we're trying to find the best move through its highest score
+                    BoardGame bestMove = null;
+
+                    // We're trying to find the best move through its highest score
                     for(BoardGame child : boardGame.getChilds()) {
-                        if(move == null) {
-                            move = child;
+                        if(bestMove == null) {
+                            bestMove = child;
                         } else {
-                            if(move.getMinMaxScore() < child.getMinMaxScore()) {
-                                move = child;
+                            if(bestMove.getMinMaxScore() < child.getMinMaxScore()) {
+                                bestMove = child;
                             }
                         }
                     }
-                    board = move.getBoard();
-                    output.write(move.getMove().getBytes(),0,move.getMove().length());
+
+                    board = bestMove.getBoard();
+                    output.write(bestMove.getMove().getBytes(),0, bestMove.getMove().length());
                     output.flush();
                 }
                 // Debut de la partie en joueur Noir
@@ -116,7 +118,7 @@ class Client {
                         }
                     }
                     board = move.getBoard();
-                    output.write(move.getMove().getBytes(),0,move.getMove().length());
+                    output.write(move.getMove().getBytes(),0, move.getMove().length());
                     System.out.println(move.getMove().getBytes() + "  " + move.getMove().length());
                     output.flush();
 
