@@ -1,26 +1,25 @@
 
 public class BoardHeuristic {
 
-    private int redPawnMultiplier = 1;
-    private int blackPawnMultiplier = -1;
-    private int pawnsCount = 0;
-    private int riskValue;
-
-    public int getBoardHeuristic(int[][] board, boolean isBlack){
+    public static int getBoardHeuristic(int[][] board, boolean isBlack){
 
         int boardScore = 0;
 
         // Verify status of game, and we affect points depending of the game status
-        if(getGameState(board, isBlack) == GameState.Lost){
-
-            return GameScores.SCORE_LOST.getValue();
-        }
-        else if(getGameState(board, isBlack) == GameState.Won){
+        if(getGameState(board, isBlack) == GameState.Won){
 
             return GameScores.SCORE_WIN.getValue();
         }
+        else if(getGameState(board, isBlack) == GameState.Lost){
+
+            return GameScores.SCORE_LOST.getValue();
+        }
 
         else{
+
+            int pawnsCount = 0;
+            int redPawnMultiplier = 1;
+            int blackPawnMultiplier = -1;
 
             if(isBlack){
                 redPawnMultiplier = -1;
@@ -31,42 +30,37 @@ public class BoardHeuristic {
                 for(int j = 0; j < board[i].length; j++){
 
                     // Current pawn
-                    int pawnType = board[i][j];
+                    int currentPawnType = board[i][j];
 
-                    if(!isBlack && pawnType == CellType.RED.getValue()){
+                    // Count how many pawn is left on the board
+                    if(isBlack && currentPawnType == CellType.BLACK.getValue())
                         pawnsCount ++;
-                    }
 
-                    if(isBlack && pawnType == CellType.BLACK.getValue()){
+                    if(!isBlack && currentPawnType == CellType.RED.getValue())
                         pawnsCount ++;
-                    }
+
 
                     // Check if token is at risk of being killed
-                    riskValue = isPawnAtRisk(board, i, j, isBlack) ? 0 : 1;
+                    int riskValue = isPawnAtRisk(board, i, j, isBlack) ? 0 : 1;
 
                     // Check how far is the pawn from the finish line
-                    if(pawnType == CellType.BLACK.getValue()){
+                    if(currentPawnType == CellType.BLACK.getValue())
                         boardScore += Math.pow(2, i) * blackPawnMultiplier * riskValue;
-                    }
-                    else if(pawnType == CellType.RED.getValue()){
+                    else if(currentPawnType == CellType.RED.getValue())
                         boardScore += Math.pow(2, board.length - 1 - i) * redPawnMultiplier * riskValue;
-                    }
 
-                    if (!isBlack && i == 7 && pawnType == CellType.RED.getValue()){
+                    // For each pawn on their first line, we give 10 point for defending
+                    if (isBlack && i == 0 && currentPawnType == CellType.BLACK.getValue())
                         boardScore += 10;
-                    }
-
-                    if(isBlack && i == 0 && pawnType == CellType.BLACK.getValue()){
+                    else if(!isBlack && i == 7 && currentPawnType == CellType.RED.getValue())
                         boardScore += 10;
-                    }
 
-                    if(!isBlack && i > 3 && pawnType == CellType.BLACK.getValue()){
+                    // If the opponent pawn is over our middle line,
+                    if(isBlack && i < 4 && currentPawnType == CellType.RED.getValue())
                         boardScore -= 100;
-                    }
 
-                    if(isBlack && i < 4 && pawnType == CellType.RED.getValue()){
+                    if(!isBlack && i > 3 && currentPawnType == CellType.BLACK.getValue())
                         boardScore -= 100;
-                    }
 
                 }
                 boardScore += pawnBackupScore(board, i, isBlack);
@@ -79,7 +73,15 @@ public class BoardHeuristic {
         return boardScore;
     }
 
-    // Dont have a strategy for now
+    /**
+     * We check if enemies are in both diagonals of the current pawn
+     *
+     * @param board
+     * @param i
+     * @param j
+     * @param isBlack
+     * @return
+     */
     public static boolean isPawnAtRisk(int[][] board, int i, int j, boolean isBlack){
 
         int contentLeftDiagonalCell = BoardTools.getLeftDiagonalPosition(board, i, j);
@@ -89,9 +91,8 @@ public class BoardHeuristic {
         if(isBlack && board[i][j] == CellType.BLACK.getValue()) {
             isInDanger = contentLeftDiagonalCell == CellType.RED.getValue() || contentRightDiagonalCell == CellType.RED.getValue();
 
-            if(isInDanger && isPositionSecured(board, i, j, isBlack)) {
-                return false;
-            }
+            if(isInDanger && isPositionSecured(board, i, j, isBlack))
+                isInDanger = false;
 
             return isInDanger;
         }
@@ -99,9 +100,8 @@ public class BoardHeuristic {
         else if(!isBlack && board[i][j] == CellType.RED.getValue()) {
             isInDanger = contentLeftDiagonalCell == CellType.BLACK.getValue() || contentRightDiagonalCell == CellType.BLACK.getValue();
 
-            if(isInDanger && isPositionSecured(board, i, j, isBlack)) {
-                return false;
-            }
+            if(isInDanger && isPositionSecured(board, i, j, isBlack))
+                isInDanger = false;
 
             return isInDanger;
         }
@@ -136,49 +136,43 @@ public class BoardHeuristic {
         }
     }
 
-
-    private int pawnBackupScore(int[][] board, int i, boolean isBlack) {
+    /**
+     * We give points for every pawn who has a connection in the same line
+     *
+     * @param board
+     * @param row
+     * @param isBlack
+     * @return
+     */
+    private static int pawnBackupScore(int[][] board, int row, boolean isBlack) {
 
         int score = 0;
+        boolean atLeastOne = false;
 
-        if(!isBlack){
-
-            boolean atLeastOne = false;
-
-            for(int column = 0; column >= board[i].length; column++){
-
-                if(board[i][column] == CellType.RED.getValue() && !atLeastOne)
+        if(!isBlack) {
+            for(int column = 0; column >= board[row].length; column++){
+                if(board[row][column] == CellType.RED.getValue() && !atLeastOne)
                     atLeastOne = true;
-
-                else if(board[i][column] == CellType.RED.getValue() && atLeastOne)
+                else if(board[row][column] == CellType.RED.getValue() && atLeastOne)
                     score += 100;
-
                 else
                     atLeastOne = false;
             }
         }
-
-        else{
-
-            boolean atLeastOne = false;
-
-            for(int column = 0; column >= board[i].length; column++){
-
-                if(board[i][column] == CellType.BLACK.getValue() && !atLeastOne)
+        else {
+            for(int column = 0; column >= board[row].length; column++){
+                if(board[row][column] == CellType.BLACK.getValue() && !atLeastOne)
                     atLeastOne = true;
-
-                else if(board[i][column] == CellType.BLACK.getValue() && atLeastOne)
+                else if(board[row][column] == CellType.BLACK.getValue() && atLeastOne)
                     score += 100;
-
                 else
                     atLeastOne = false;
             }
         }
-
         return score;
     }
 
-    public GameState getGameState(int[][] board, boolean isBlack){
+    public static GameState getGameState(int[][] board, boolean isBlack){
 
         // If it's red
         if(!isBlack){

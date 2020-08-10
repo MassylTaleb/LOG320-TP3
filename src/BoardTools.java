@@ -17,46 +17,64 @@ public class BoardTools {
         return value.toString();
     }
 
-    public static int getLeftDiagonalPosition(int[][] board, int xPosition, int yPosition) {
+    /**
+     * Get the content on the diagonal in the left side of the screen.
+     *
+     * @param board
+     * @param row
+     * @param column
+     * @return
+     */
+    public static int getLeftDiagonalPosition(int[][] board, int row, int column) {
         int position = CellType.FORBIDDEN.getValue();
 
-        if(yPosition < board.length - 1) {
-            if (board[xPosition][yPosition] == CellType.BLACK.getValue() && xPosition < board.length - 1)
-                position = board[xPosition + 1][yPosition + 1];
-        }else if(yPosition > 0){
-            if(board[xPosition][yPosition] == CellType.RED.getValue() && xPosition > 0)
-                position = board[xPosition - 1][yPosition - 1];
+        if(column > 0) {
+
+            if (board[row][column] == CellType.RED.getValue() && row > 0)
+                position = board[row - 1][column - 1];
+
+            else if (board[row][column] == CellType.BLACK.getValue() && row < board.length - 1)
+                position = board[row + 1][column - 1];
         }
         return position;
     }
 
-    public static void moveToLeftDiagonal(int[][] board, int xPosition, int yPosition){
+    public static void moveToLeftDiagonal(int[][] board, int row, int column){
 
-        if(yPosition < board.length - 1) {
 
-            if (board[xPosition][yPosition] == CellType.BLACK.getValue() && xPosition < board.length - 1) {
+        if(column > 0) {
 
-                board[xPosition + 1][yPosition + 1] = board[xPosition][yPosition];
-                board[xPosition][yPosition] = CellType.EMPTY.getValue();
+            if(board[row][column] == CellType.RED.getValue() && row > 0) {
+
+                board[row - 1][column - 1] = board[row][column];
+                board[row][column] = CellType.EMPTY.getValue();
             }
-        }else if(yPosition > 0){
-            if(board[xPosition][yPosition] == CellType.RED.getValue() && xPosition > 0){
 
-                board[xPosition-1][yPosition-1] = board[xPosition][yPosition];
-                board[xPosition][yPosition] = CellType.EMPTY.getValue();
+            else if (board[row][column] == CellType.BLACK.getValue() && row < board.length - 1) {
+
+                board[row + 1][column - 1] = board[row][column];
+                board[row][column] = CellType.EMPTY.getValue();
             }
         }
     }
 
+    /**
+     * Get the content on the diagonal in the right side of the screen.
+     *
+     * @param board
+     * @param row
+     * @param column
+     * @return
+     */
     public static int getRightDiagonalCellPosition(int[][] board, int xPosition, int yPosition) {
         int position = CellType.FORBIDDEN.getValue();
 
-        if(yPosition > 0){
+        if(yPosition < board.length - 1){
 
             if(board[xPosition][yPosition] == CellType.BLACK.getValue() && xPosition < board.length - 1)
-                position = board[xPosition + 1][yPosition - 1];
-        }else if(yPosition < board.length - 1) {
-            if (board[xPosition][yPosition] == CellType.RED.getValue() && xPosition > 0)
+                position = board[xPosition + 1][yPosition + 1];
+
+            else if (board[xPosition][yPosition] == CellType.RED.getValue() && xPosition > 0)
                 position = board[xPosition - 1][yPosition + 1];
         }
         return position;
@@ -64,17 +82,17 @@ public class BoardTools {
 
     public static void moveToRightDiagonal(int[][] board, int xPosition, int yPosition){
 
-        if(yPosition > 0){
+        if(yPosition < board.length - 1){
 
             if(board[xPosition][yPosition] == CellType.BLACK.getValue() && xPosition < board.length - 1){
 
-                board[xPosition+1][yPosition-1] = board[xPosition][yPosition];
+                board[xPosition + 1][yPosition + 1] = board[xPosition][yPosition];
                 board[xPosition][yPosition] = CellType.EMPTY.getValue();
             }
-        }else if(yPosition < board.length - 1) {
-            if(board[xPosition][yPosition] == CellType.RED.getValue() && xPosition > 0){
 
-                board[xPosition-1][yPosition+1] = board[xPosition][yPosition];
+            else if(board[xPosition][yPosition] == CellType.RED.getValue() && xPosition > 0){
+
+                board[xPosition - 1][yPosition + 1] = board[xPosition][yPosition];
                 board[xPosition][yPosition] = CellType.EMPTY.getValue();
             }
         }
@@ -82,11 +100,13 @@ public class BoardTools {
 
     public static int getFrontCellPosition(int[][] board, int xPosition, int yPosition) {
         int position = CellType.FORBIDDEN.getValue();
+
         if(board[xPosition][yPosition] == CellType.BLACK.getValue() && xPosition < board.length - 1)
-            position = board[xPosition+1][yPosition];
+            position = board[xPosition + 1][yPosition];
 
         else if(board[xPosition][yPosition] == CellType.RED.getValue() && xPosition > 0)
-            position = board[xPosition-1][yPosition];
+            position = board[xPosition - 1][yPosition];
+
         return position;
     }
 
@@ -94,13 +114,13 @@ public class BoardTools {
 
         if(board[xPosition][yPosition] == CellType.BLACK.getValue() && xPosition < board.length - 1){
 
-            board[xPosition+1][yPosition] = board[xPosition][yPosition];
+            board[xPosition + 1][yPosition] = board[xPosition][yPosition];
             board[xPosition][yPosition] = CellType.EMPTY.getValue();
         }
 
         else if(board[xPosition][yPosition] == CellType.RED.getValue() && xPosition > 0){
 
-            board[xPosition-1][yPosition] = board[xPosition][yPosition];
+            board[xPosition - 1][yPosition] = board[xPosition][yPosition];
             board[xPosition][yPosition] = CellType.EMPTY.getValue();
         }
     }
@@ -135,5 +155,56 @@ public class BoardTools {
         }
 
         return position;
+    }
+
+    public static void buildNewBoardWithMove(String s, int[][] board)
+    {
+        int startAndEnd = Integer.parseInt(s.replaceAll("[^0-9]", ""));
+        int fromDigit = Integer.parseInt(Integer.toString(startAndEnd).substring(0, 1));
+        int toDigit = startAndEnd % 10;
+        String fromLetter = s.substring(1, 2);
+        String toLetter = s.substring(6, 7);
+
+        int fromLetterDigit = 0;
+        switch (fromLetter) {
+            case "A":  fromLetterDigit = 0;
+                break;
+            case "B":  fromLetterDigit = 1;
+                break;
+            case "C":  fromLetterDigit = 2;
+                break;
+            case "D":  fromLetterDigit = 3;
+                break;
+            case "E":  fromLetterDigit = 4;
+                break;
+            case "F":  fromLetterDigit = 5;
+                break;
+            case "G":  fromLetterDigit = 6;
+                break;
+            case "H":  fromLetterDigit = 7;
+                break;
+        }
+
+        int toLetterDigit = 0;
+        switch (toLetter) {
+            case "A":  toLetterDigit = 0;
+                break;
+            case "B":  toLetterDigit = 1;
+                break;
+            case "C":  toLetterDigit = 2;
+                break;
+            case "D":  toLetterDigit = 3;
+                break;
+            case "E":  toLetterDigit = 4;
+                break;
+            case "F":  toLetterDigit = 5;
+                break;
+            case "G":  toLetterDigit = 6;
+                break;
+            case "H":  toLetterDigit = 7;
+                break;
+        }
+        board[8-toDigit][toLetterDigit] = board[8-fromDigit][fromLetterDigit];
+        board[8-fromDigit][fromLetterDigit] = 0;
     }
 }

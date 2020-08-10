@@ -1,8 +1,10 @@
+import java.util.Arrays;
+
 public class Algorithm {
 
     public static void minimax(BoardGame board, boolean maximizingPlayer) {
 
-        if (Timer.getTimeElapsed() > 4.0) { return; }
+//        if (Timer.getTimeElapsed() > 4.0) { return; }
 
         // Check if
         if(board.getTreeDepth() < 6 && board.getGameState() == GameState.Playing) {
@@ -93,8 +95,8 @@ public class Algorithm {
      */
     static void expandChilds(BoardGame boardGame) {
 
-        int depthTree = boardGame.isBlack() ? 1 : 0; //
-        int[][] boardCopy; //deaclaration of board copy
+        int turnToPlayDepth = boardGame.isBlack() ? 1 : 0; //
+        int[][] boardCopy; // Copy of the received board
         int contentLeftDiagonalCell; //decalaration of left diagonal move
         int contentRightDiagonalCell; //decalaration of right diagonal move
         int contentFrontCell; //decalaration of front move
@@ -102,31 +104,41 @@ public class Algorithm {
 
         //Go through whole board
         for(int i = 0; i < boardGame.getBoard().length; i++) {
-            for(int j = 0; j < boardGame.getBoard()[0].length; j++) {
+            for(int j = 0; j < boardGame.getBoard()[i].length; j++) {
 
-                boardCopy = cloneBoard(boardGame.getBoard()); //copy the actual board
-                contentLeftDiagonalCell = BoardTools.getLeftDiagonalPosition(boardCopy, i, j); //get what is in the left diagonal position from actual pawn
-                contentRightDiagonalCell = BoardTools.getRightDiagonalCellPosition(boardCopy, i, j);//get what is in the right diagonal position from actual pawn
-                contentFrontCell = BoardTools.getFrontCellPosition(boardCopy, i, j);//get what is in the front position from actual pawn
+                contentLeftDiagonalCell = BoardTools.getLeftDiagonalPosition(boardGame.getBoard(), i, j); // Get the content on the diagonal in the left side of the screen
+                contentRightDiagonalCell = BoardTools.getRightDiagonalCellPosition(boardGame.getBoard(), i, j);// Get the content on the diagonal in the right side of the screen
+                contentFrontCell = BoardTools.getFrontCellPosition(boardGame.getBoard(), i, j);// Get the content on the front of the pawn
+
                 //If we(AI) are playing
-                if(boardGame.getTreeDepth() % 2 == depthTree) {
+                if(boardGame.getTreeDepth() % 2 == turnToPlayDepth) {
+
                     //If pawn is red in actual board position
-                    if(boardCopy[i][j] == CellType.RED.getValue()) {
-                        //Verify if position diagonal left from actual board position is neither red or forbidden
+                    if(boardGame.getBoard()[i][j] == CellType.RED.getValue()) {
+
+                        // Verify if position diagonal left from actual board position is neither red or forbidden
                         if(contentLeftDiagonalCell != CellType.FORBIDDEN.getValue() && contentLeftDiagonalCell != CellType.RED.getValue()) {
-                            BoardTools.moveToLeftDiagonal(boardCopy, i, j); //Simulate move to diagonal left?
+
+                            boardCopy = cloneBoard(boardGame.getBoard());
+                            BoardTools.moveToLeftDiagonal(boardCopy, i, j); // Simulate move to diagonal left to the copied board
                             newMove = BoardTools.positionValue(boardCopy,i, j) + BoardTools.positionValue(boardCopy,i - 1, j - 1); //Append values of current position and new postion
-                            //TODO : Shouldn't we only add the newMove to the childsList and then make a new board and loop through minimax? Why are we adding a board to the childs? Unless we actually get the move of that board when we evaluate
+                            // TODO : Shouldn't we only add the newMove to the childsList and then make a new board and loop through minimax? Why are we adding a board to the childs? Unless we actually get the move of that board when we evaluate
                             boardGame.getChilds().add(new BoardGame(boardCopy, boardGame.isBlack(), boardGame.getTreeDepth() + 1, newMove, boardGame.getBoardScore()));
                         }
-                        //Verify if position diagonal right from actual board position is neither red or forbidden
+
+                        // Verify if position diagonal right from actual board position is neither red or forbidden
                         if(contentRightDiagonalCell != CellType.FORBIDDEN.getValue() && contentRightDiagonalCell != CellType.RED.getValue()) {
+
+                            boardCopy = cloneBoard(boardGame.getBoard());
                             BoardTools.moveToRightDiagonal(boardCopy, i, j);
                             newMove = BoardTools.positionValue(boardCopy,i, j) + BoardTools.positionValue(boardCopy,i - 1, j + 1);
                             boardGame.getChilds().add(new BoardGame(boardCopy, boardGame.isBlack(), boardGame.getTreeDepth() + 1, newMove, boardGame.getBoardScore()));
                         }
 
-                        if(contentFrontCell != CellType.FORBIDDEN.getValue() && contentFrontCell != CellType.RED.getValue()) {
+//                        if(contentFrontCell != CellType.FORBIDDEN.getValue() && contentFrontCell != CellType.RED.getValue()) {
+                        if(contentFrontCell == CellType.EMPTY.getValue()) {
+
+                            boardCopy = cloneBoard(boardGame.getBoard());
                             BoardTools.moveToFront(boardCopy, i, j);
                             newMove = BoardTools.positionValue(boardCopy, i, j) + BoardTools.positionValue(boardCopy, i - 1, j);
                             boardGame.getChilds().add(new BoardGame(boardCopy, boardGame.isBlack(), boardGame.getTreeDepth() + 1, newMove, boardGame.getBoardScore()));
@@ -135,21 +147,25 @@ public class Algorithm {
                     //If they are playing
                 } else {
                     //If pawn is black in actual board position
-                    if(boardCopy[i][j] == CellType.BLACK.getValue()) {
+                    if(boardGame.getBoard()[i][j] == CellType.BLACK.getValue()) {
                         //Verify if position diagonal left from actual board position is neither black or forbidden
                         if(contentLeftDiagonalCell != CellType.FORBIDDEN.getValue() && contentLeftDiagonalCell != CellType.BLACK.getValue()) {
+                            boardCopy = cloneBoard(boardGame.getBoard());
                             BoardTools.moveToLeftDiagonal(boardCopy, i, j);
-                            newMove = BoardTools.positionValue(boardCopy,i, j) + BoardTools.positionValue(boardCopy, i + 1, j + 1);
+                            newMove = BoardTools.positionValue(boardCopy,i, j) + BoardTools.positionValue(boardCopy, i + 1, j - 1);
                             boardGame.getChilds().add(new BoardGame(boardCopy, boardGame.isBlack(), boardGame.getTreeDepth() + 1, newMove, boardGame.getBoardScore()));
                         }
                         //Verify if position diagonal right from actual board position is neither black or forbidden
                         if(contentRightDiagonalCell != CellType.FORBIDDEN.getValue() && contentRightDiagonalCell != CellType.BLACK.getValue()) {
+                            boardCopy = cloneBoard(boardGame.getBoard());
                             BoardTools.moveToRightDiagonal(boardCopy, i, j);
-                            newMove = BoardTools.positionValue(boardCopy, i, j) + BoardTools.positionValue(boardCopy,i + 1, j - 1);
+                            newMove = BoardTools.positionValue(boardCopy, i, j) + BoardTools.positionValue(boardCopy,i + 1, j + 1);
                             boardGame.getChilds().add(new BoardGame(boardCopy, boardGame.isBlack(), boardGame.getTreeDepth() + 1, newMove, boardGame.getBoardScore()));
                         }
 
-                        if(contentFrontCell != CellType.FORBIDDEN.getValue() && contentFrontCell != CellType.BLACK.getValue()) {
+//                        if(contentFrontCell != CellType.FORBIDDEN.getValue() && contentFrontCell != CellType.BLACK.getValue()) {
+                        if(contentFrontCell == CellType.EMPTY.getValue()) {
+                            boardCopy = cloneBoard(boardGame.getBoard());
                             BoardTools.moveToFront(boardCopy, i, j);
                             newMove = BoardTools.positionValue(boardCopy, i, j) + BoardTools.positionValue(boardCopy,i + 1, j);
                             boardGame.getChilds().add(new BoardGame(boardCopy, boardGame.isBlack(), boardGame.getTreeDepth() + 1, newMove, boardGame.getBoardScore()));

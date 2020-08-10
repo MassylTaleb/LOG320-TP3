@@ -32,26 +32,20 @@ public class BoardGame {
         this.move = move;
 
         // Affect the score of the current board
-        this.boardScore = new BoardHeuristic().getBoardHeuristic(board, isBlack);
+        this.boardScore = BoardHeuristic.getBoardHeuristic(board, isBlack);
 
         // Set game status depending on score
-        if (this.boardScore == GameScores.SCORE_WIN.getValue()) {
-
+        if (this.boardScore == GameScores.SCORE_WIN.getValue())
             this.gameState = GameState.Won;
 
-        } else if (this.boardScore == GameScores.SCORE_LOST.getValue()) {
-
+        else if (this.boardScore == GameScores.SCORE_LOST.getValue())
             this.gameState = GameState.Lost;
 
-        } else {
-
+        else
             this.gameState = GameState.Playing;
-        }
     }
 
-    public int getTreeDepth() {
-        return this.treeDepth;
-    }
+    public int getTreeDepth() { return this.treeDepth; }
 
     public boolean isBlack() {
         return isBlack;
@@ -61,21 +55,15 @@ public class BoardGame {
         return gameState;
     }
 
-    public int getBoardScore() {
-        return boardScore;
-    }
+    public int getBoardScore() { return boardScore; }
 
     public int getMinMaxScore() {
         return minMaxScore;
     }
 
-    public void setMinMaxScore(int minMaxScore) {
-        this.minMaxScore = minMaxScore;
-    }
+    public void setMinMaxScore(int minMaxScore) { this.minMaxScore = minMaxScore; }
 
-    public int getAlpha() {
-        return alpha;
-    }
+    public int getAlpha() { return alpha; }
 
     public void setAlpha(int alpha) {
         this.alpha = alpha;
@@ -101,8 +89,6 @@ public class BoardGame {
         this.childs = childs;
     }
 
-    public String getMove() {
-        return move;
-    }
+    public String getMove() { return move; }
 }
 

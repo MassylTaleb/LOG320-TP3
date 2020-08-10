@@ -1,8 +1,10 @@
 import java.io.*;
-import java.net.*;
-
+import java.net.Socket;
 
 class Client {
+
+    private static boolean isBlack;
+
     public static void main(String[] args) {
 
         Socket MyClient;
@@ -28,64 +30,65 @@ class Client {
 
                     int size = input.available();
                     input.read(aBuffer,0, size);
-
                     String s = new String(aBuffer).trim();
-                    System.out.println(s);
-
                     String[] boardValues = s.split(" ");
 
                     int x = 0, y = 0;
                     for (String boardValue : boardValues) {
                         board[x][y] = Integer.parseInt(boardValue);
+                        System.out.printf("%d", board[x][y]);
                         y++;
                         if (y == 8) {
                             y = 0;
                             x++;
+                            System.out.print("\n");
                         }
                     }
 
                     Timer.resetTimer();
                     Timer.startTimer();
 
-                    BoardGame boardGame = new BoardGame(board, false, 0, null, 0);
+                    isBlack = false;
+                    BoardGame boardGame = new BoardGame(board, isBlack, 0, null, 0);
                     Algorithm.minimax(boardGame, true);
-                    System.out.println("Nouvelle partie! Vous jouer blanc, entrez votre premier coup : ");
+                    System.out.println("Nouvelle partie! Vous jouer rouge, entrez votre premier coup : ");
                     BoardGame bestMove = null;
 
                     // We're trying to find the best move through its highest score
                     for(BoardGame child : boardGame.getChilds()) {
-                        if(bestMove == null) {
+                        if(bestMove == null)
                             bestMove = child;
-                        } else {
-                            if(bestMove.getMinMaxScore() < child.getMinMaxScore()) {
+                        else
+                            if(bestMove.getMinMaxScore() < child.getMinMaxScore())
                                 bestMove = child;
-                            }
-                        }
                     }
 
                     board = bestMove.getBoard();
                     output.write(bestMove.getMove().getBytes(),0, bestMove.getMove().length());
                     output.flush();
                 }
+
                 // Debut de la partie en joueur Noir
                 if(cmd == '2'){
+
                     System.out.println("Nouvelle partie! Vous jouer noir, attendez le coup des rouges");
                     byte[] aBuffer = new byte[1024];
 
                     int size = input.available();
-                    //System.out.println("size " + size);
-                    input.read(aBuffer,0,size);
+                    input.read(aBuffer,0, size);
                     String s = new String(aBuffer).trim();
-                    System.out.println(s);
-                    String[] boardValues;
-                    boardValues = s.split(" ");
-                    int x=0,y=0;
-                    for(int i=0; i<boardValues.length;i++){
-                        board[x][y] = Integer.parseInt(boardValues[i]);
+                    String[] boardValues = s.split(" ");
+                    isBlack = true;
+
+                    int x = 0, y = 0;
+                    for (String boardValue : boardValues) {
+                        board[x][y] = Integer.parseInt(boardValue);
+                        System.out.printf("%d", board[x][y]);
                         y++;
-                        if(y == 8){
+                        if (y == 8) {
                             y = 0;
                             x++;
+                            System.out.print("\n");
                         }
                     }
                 }
@@ -94,70 +97,53 @@ class Client {
                 // Le message contient aussi le dernier coup joue.
                 if(cmd == '3'){
                     byte[] aBuffer = new byte[16];
-
                     int size = input.available();
-                    System.out.println("size :" + size);
-                    input.read(aBuffer,0,size);
+                    input.read(aBuffer,0, size);
 
                     String s = new String(aBuffer);
-                    System.out.println("Dernier coup :"+ s);
+                    System.out.println("Dernier coup :" + s);
                     System.out.println("Entrez votre coup : ");
+
+                    BoardTools.buildNewBoardWithMove(s, board);
+
                     Timer.resetTimer();
                     Timer.startTimer();
-                    BoardGame boardGame = new BoardGame(board, false, 0, null, 0);
+                    BoardGame boardGame = new BoardGame(board, isBlack, 0, null, 0);
                     Algorithm.minimax(boardGame, true);
-                    BoardGame move = null;
+                    BoardGame bestMove = null;
 
                     for(BoardGame child : boardGame.getChilds()) {
-                        if(move == null) {
-                            move = child;
-                        } else {
-                            if(move.getMinMaxScore() < child.getMinMaxScore()) {
-                                move = child;
-                            }
-                        }
+                        if(bestMove == null)
+                            bestMove = child;
+                        else
+                            if(bestMove.getMinMaxScore() < child.getMinMaxScore())
+                                bestMove = child;
                     }
-                    board = move.getBoard();
-                    output.write(move.getMove().getBytes(),0, move.getMove().length());
-                    System.out.println(move.getMove().getBytes() + "  " + move.getMove().length());
-                    output.flush();
 
+                    board = bestMove.getBoard();
+                    System.out.println(bestMove.getMove());
+                    System.out.println("Elapsed Time: " + Timer.getTimeElapsed());
+                    output.write(bestMove.getMove().getBytes(),0, bestMove.getMove().length());
+                    output.flush();
                 }
-                // Le dernier coup est invalide
-                if(cmd == '4'){
+
+                // Manage when the last play was an error
+                if(cmd == '4') {
                     System.out.println("Coup invalide, entrez un nouveau coup : ");
-                    Timer.resetTimer();
-                    Timer.startTimer();
-                    BoardGame boardGame = new BoardGame(board, false, 0, null, 0);
-                    Algorithm.minimax(boardGame, true);
-                    BoardGame move = null;
-
-                    for(BoardGame child : boardGame.getChilds()) {
-                        if(move == null) {
-                            move = child;
-                        } else {
-                            if(move.getMinMaxScore() < child.getMinMaxScore()) {
-                                move = child;
-                            }
-                        }
-                    }
-                    board = move.getBoard();
-                    output.write(move.getMove().getBytes(),0,move.getMove().length());
+                    String lastMove = null;
+                    lastMove = console.readLine();
+                    output.write(lastMove.getBytes(),0,lastMove.length());
                     output.flush();
-
                 }
-                // La partie est terminée
-                if(cmd == '5'){
+
+                // The game is over
+                if(cmd == '5') {
                     byte[] aBuffer = new byte[16];
                     int size = input.available();
-                    input.read(aBuffer,0,size);
+                    input.read(aBuffer,0, size);
                     String s = new String(aBuffer);
-                    System.out.println("Partie Terminé. Le dernier coup joué est: "+s);
-                    String move = null;
-                    move = console.readLine();
-                    output.write(move.getBytes(),0,move.length());
-                    output.flush();
-
+                    System.out.println("Partie Terminé. Le dernier coup joué est: " + s);
+                    return;
                 }
             }
         }
